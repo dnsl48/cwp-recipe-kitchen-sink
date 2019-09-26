@@ -11,6 +11,7 @@ jobs:
       # Composer Install
 
       - run: composer validate
+      - run: composer install --prefer-source --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
 
       - run:
           name: Greeting
