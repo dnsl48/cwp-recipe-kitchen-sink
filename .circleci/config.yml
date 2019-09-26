@@ -1,11 +1,16 @@
-version: 2
+version: 2.1
 jobs:
   build:
     docker:
       - image: dnsl48/silverstripe-php71-cli:latest
+      - image: circleci/mysql:5.6
 
     steps:
       - checkout
+
+      # Composer Install
+
+      - run: composer validate
 
       - run:
           name: Greeting
