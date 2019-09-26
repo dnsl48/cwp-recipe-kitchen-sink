@@ -4,6 +4,11 @@ jobs:
     docker:
       - image: dnsl48/silverstripe-php71-cli:latest
       - image: circleci/mysql:5.6
+        environment:
+          MYSQL_USER: root
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: the_database
+          MYSQL_HOST: '127.0.0.1'
 
     steps:
       - checkout
@@ -11,7 +16,19 @@ jobs:
       # Composer Install
 
       - run: composer validate
+
+      - restore_cache:
+          keys:
+            - composer-v1-{{ checksum "composer.lock" }}
+
       - run: composer install --prefer-source --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
+
+      - save_cache:
+          key: composer-v1-{{ checksum "composer.lock" }}
+          paths:
+            - vendor
+
+      - run: vendor/bin/phpunit --testsuite "$PHPUNIT_TEST" --exclude-group exclude-from-travis;
 
       - run:
           name: Greeting
