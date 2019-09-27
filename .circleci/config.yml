@@ -15,20 +15,19 @@ jobs:
 
       # Composer Install
 
-      - run: composer validate
-
       - restore_cache:
           keys:
-            - composer-v1-{{ checksum "composer.lock" }}
+            - composer-cache
 
+      - run: composer validate
       - run: composer install --prefer-source --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
 
       - save_cache:
-          key: composer-v1-{{ checksum "composer.lock" }}
+          key: composer-cache
           paths:
-            - vendor
+            - ~/.cache/.composer/cache/
 
-      - run: vendor/bin/phpunit --testsuite "$PHPUNIT_TEST" --exclude-group exclude-from-travis;
+      - run: vendor/bin/phpunit --testsuite mfa --exclude-group exclude-from-travis;
 
       - run:
           name: Greeting
