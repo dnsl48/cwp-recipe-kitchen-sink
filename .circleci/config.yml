@@ -86,6 +86,7 @@ orbs:
           mysql-version: <<parameters.mysql>>
 
         steps:
+          - install
           - phpunit-suite:
               suite: mfa
 
