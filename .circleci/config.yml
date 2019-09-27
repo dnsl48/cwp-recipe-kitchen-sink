@@ -4,12 +4,19 @@ jobs:
     docker:
       - image: dnsl48/silverstripe-php71-cli:latest
         user: root
+        environment:
+          SS_DATABASE_CLASS: MySQLDatabase
+          SS_DATABASE_NAME: the_database
+          SS_DATABASE_USERNAME: root
+          SS_DATABASE_PASSWORD: root
+          SS_DATABASE_SERVER: mysql56
       - image: circleci/mysql:5.6
+        name: mysql56
         environment:
           MYSQL_USER: root
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: the_database
-          MYSQL_HOST: '127.0.0.1'
+          MYSQL_HOST: mysql56
 
     steps:
       - checkout
