@@ -4,13 +4,3 @@ description: Testing the Orbs
 
 orbs:
   core: dnsl48/silverstripe-core@dev:unua
-
-workflows:
-  version: 2
-  main:
-    jobs:
-      - core/unit-suite-with-mysql:
-          suite: mfa
-
-      - core/unit-suite-with-mysql:
-          suite: optional-authenticators
