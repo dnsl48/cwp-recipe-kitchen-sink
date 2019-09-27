@@ -1,57 +1,95 @@
 version: 2.1
-jobs:
-  build:
-    docker:
-      - image: dnsl48/silverstripe-php71-cli:latest
-        user: root
-        environment:
-          SS_DATABASE_CLASS: MySQLDatabase
-          SS_DATABASE_NAME: the_database
-          SS_DATABASE_USERNAME: root
-          SS_DATABASE_PASSWORD: root
-          SS_DATABASE_SERVER: mysql56
-      - image: circleci/mysql:5.6
-        name: mysql56
-        environment:
-          MYSQL_USER: root
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: the_database
-          MYSQL_HOST: mysql56
 
-    steps:
-      - checkout
+description: Testing the Orbs
 
-      # Configure PHP
+orbs:
+  silver-orb:
+    executors:
+      mysql:
+        parameters:
+          php-version:
+            type: string
+            default: '71'
+          mysql-version:
+            type: string
+            default: '5.6'
+        docker:
+          - image: dnsl48/silverstripe-php<<parameters.php-version>>-cli:latest
+            user: root
+            environment:
+              SS_DATABASE_CLASS: MySQLDatabase
+              SS_DATABASE_NAME: the_database
+              SS_DATABASE_USERNAME: root
+              SS_DATABASE_PASSWORD: root
+              SS_DATABASE_SERVER: mysql
+              SS_DEFAULT_ADMIN_USERNAME: admin
+              SS_DEFAULT_ADMIN_PASSWORD: password
+          - image: circleci/mysql:<<parameters.mysql-version>>
+            name: mysql
+            environment:
+              MYSQL_USER: root
+              MYSQL_ROOT_PASSWORD: root
+              MYSQL_DATABASE: the_database
+              MYSQL_HOST: mysql
 
-      - run:
-          name: configure php.ini
-          command: |
-            cat \<< EOF > /usr/local/etc/php/php.ini
-            memory_limit=2G
-            date.timezone=Pacific/Auckland
-            EOF
+    commands:
+      install:
+        steps:
+          - checkout
 
+          - run:
+              name: configure php.ini
+              command: |
+                cat \<< EOF > /usr/local/etc/php/php.ini
+                memory_limit=2G
+                date.timezone=Pacific/Auckland
+                EOF
 
-      # Composer Install
+          - restore_cache:
+              keys:
+                - composer-cache-{{ .Branch }}
 
-      - restore_cache:
-          keys:
-            - composer-cache-{{ .Branch }}
+          - run: composer validate
+          - run: composer install --prefer-source --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
 
-      - run: composer validate
-      - run: composer install --prefer-source --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
+          - save_cache:
+              key: composer-cache-{{ .Branch }}
+              paths:
+                - ~/.composer/cache
+                - vendor
 
-      - save_cache:
-          key: composer-cache-{{ .Branch }}
-          paths:
-            - ~/.composer/cache
+      phpunit-suite:
+        parameters:
+          suite:
+            type: string
+        steps:
+          - run: vendor/bin/phpunit --testsuite <<parameters.suite>> --exclude-group exclude-from-travis;
 
-      - run: vendor/bin/phpunit --testsuite mfa --exclude-group exclude-from-travis;
+      phpunit-all:
+        steps:
+          - run: vendor/bin/phpunit --exclude-group exclude-from-travis;
 
-      - run:
-          name: Greeting
-          command: echo Hello, world.
+    jobs:
+      unit-tests-with-mysql:
+        parameters:
+          php:
+            type: string
+            default: '71'
 
-      - run:
-          name: Print the Current Time
-          command: date
+          mysql:
+            type: string
+            default: '5.6'
+
+        executor:
+          name: mysql
+          php-version: <<parameters.php>>
+          mysql-version: <<parameters.mysql>>
+
+        steps:
+          - phpunit-suite:
+              suite: mfa
+
+workflows:
+  main:
+    jobs:
+      - silver-orb/unit-tests-with-mysql
