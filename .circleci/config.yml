@@ -3,6 +3,7 @@ jobs:
   build:
     docker:
       - image: dnsl48/silverstripe-php71-cli:latest
+        user: root
       - image: circleci/mysql:5.6
         environment:
           MYSQL_USER: root
@@ -15,13 +16,13 @@ jobs:
 
       # Configure PHP
 
-      # - run:
-      #     name: configure php.ini
-      #     command: |
-      #       cat << EOF > /usr/local/etc/php/php.ini
-      #       memory_limit=2G
-      #       date.timezone=Pacific/Auckland
-      #       EOF
+      - run:
+          name: configure php.ini
+          command: |
+            cat \<< EOF > /usr/local/etc/php/php.ini
+            memory_limit=2G
+            date.timezone=Pacific/Auckland
+            EOF
 
 
       # Composer Install
