@@ -15,13 +15,13 @@ jobs:
 
       # Configure PHP
 
-      - run:
-          name: configure php.ini
-          command: |
-            cat << EOF > /usr/local/etc/php/php.ini
-            memory_limit=2G
-            date.timezone=Pacific/Auckland
-            EOF
+      # - run:
+      #     name: configure php.ini
+      #     command: |
+      #       cat << EOF > /usr/local/etc/php/php.ini
+      #       memory_limit=2G
+      #       date.timezone=Pacific/Auckland
+      #       EOF
 
 
       # Composer Install
