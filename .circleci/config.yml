@@ -47,14 +47,14 @@ orbs:
 
           - restore_cache:
               keys:
-                - composer-cache-{{ .Branch }}-1
+                - composer-cache-{{ .Branch }}-2
 
           - run: composer validate
-          # - run: composer install --prefer-source --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
-          - run: composer update --prefer-source --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
+          - run: composer install --prefer-source --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
+          # - run: composer update --prefer-source --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
 
           - save_cache:
-              key: composer-cache-{{ .Branch }}-1
+              key: composer-cache-{{ .Branch }}-2
               paths:
                 - ~/.composer/cache
                 - vendor
