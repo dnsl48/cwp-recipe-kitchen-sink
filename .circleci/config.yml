@@ -13,19 +13,30 @@ jobs:
     steps:
       - checkout
 
+      # Configure PHP
+
+      - run:
+          name: configure php.ini
+          command: |
+            cat << EOF > /usr/local/etc/php/php.ini
+            memory_limit=2G
+            date.timezone=Pacific/Auckland
+            EOF
+
+
       # Composer Install
 
       - restore_cache:
           keys:
-            - composer-cache
+            - composer-cache-{{ .Branch }}
 
       - run: composer validate
       - run: composer install --prefer-source --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
 
       - save_cache:
-          key: composer-cache
+          key: composer-cache-{{ .Branch }}
           paths:
-            - ~/.cache/.composer/cache/
+            - ~/.composer/cache
 
       - run: vendor/bin/phpunit --testsuite mfa --exclude-group exclude-from-travis;
 
