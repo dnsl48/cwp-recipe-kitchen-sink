@@ -47,13 +47,14 @@ orbs:
 
           - restore_cache:
               keys:
-                - composer-cache-{{ .Branch }}
+                - composer-cache-{{ .Branch }}-1
 
           - run: composer validate
-          - run: composer install --prefer-source --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
+          # - run: composer install --prefer-source --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
+          - run: composer update --prefer-source --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
 
           - save_cache:
-              key: composer-cache-{{ .Branch }}
+              key: composer-cache-{{ .Branch }}-1
               paths:
                 - ~/.composer/cache
                 - vendor
@@ -90,7 +91,31 @@ orbs:
           - phpunit-suite:
               suite: mfa
 
+      unit-suite-with-mysql:
+        parameters:
+          suite:
+            type: string
+
+          php:
+            type: string
+            default: '71'
+
+          mysql:
+            type: string
+            default: '5.6'
+
+        executor:
+          name: mysql
+          php-version: <<parameters.php>>
+          mysql-version: <<parameters.mysql>>
+
+        steps:
+          - install
+          - phpunit-suite:
+              suite: <<parameters.suite>>
+
 workflows:
   main:
     jobs:
-      - silver-orb/unit-tests-with-mysql
+      - silver-orb/unit-suite-with-mysql:
+          suite: mfa
