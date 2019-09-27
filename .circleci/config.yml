@@ -88,8 +88,7 @@ orbs:
 
         steps:
           - install
-          - phpunit-suite:
-              suite: mfa
+          - phpunit-all
 
       unit-suite-with-mysql:
         parameters:
@@ -119,3 +118,9 @@ workflows:
     jobs:
       - silver-orb/unit-suite-with-mysql:
           suite: mfa
+
+      - silver-orb/unit-suite-with-mysql:
+          suite: optional-authenticators
+
+      - silver-orb/unit-suite-with-mysql:
+          suite: recipe-services
