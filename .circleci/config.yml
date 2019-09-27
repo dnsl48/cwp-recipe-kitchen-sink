@@ -121,6 +121,3 @@ workflows:
 
       - silver-orb/unit-suite-with-mysql:
           suite: optional-authenticators
-
-      - silver-orb/unit-suite-with-mysql:
-          suite: recipe-services
